@@ -28,7 +28,6 @@ class BacktestRunner:
 
         df = df.sort_index()
 
-        # Convert column names for Backtrader
         df = df.rename(columns={
             "Open": "open",
             "High": "high",
@@ -49,13 +48,58 @@ class BacktestRunner:
 
         cerebro.addstrategy(SmaCross)
 
+        # ➕ ADD QUANT ANALYZERS
+        cerebro.addanalyzer(bt.analyzers.SharpeRatio, _name='sharpe', timeframe=bt.TimeFrame.Days)
+        cerebro.addanalyzer(bt.analyzers.DrawDown, _name='drawdown')
+        cerebro.addanalyzer(bt.analyzers.TradeAnalyzer, _name='trades')
+        cerebro.addanalyzer(bt.analyzers.Returns, _name='returns')
+
         print(f"\n💰 Starting Portfolio Value: {cerebro.broker.getvalue():.2f}")
-        cerebro.run()
+
+        results = cerebro.run()
+        strat = results[0]
+
         print(f"💰 Final Portfolio Value: {cerebro.broker.getvalue():.2f}")
 
-        # Create performance chart
+        # Extract analyzer results
+        sharpe = strat.analyzers.sharpe.get_analysis()
+        drawdown = strat.analyzers.drawdown.get_analysis()
+        trades = strat.analyzers.trades.get_analysis()
+        returns = strat.analyzers.returns.get_analysis()
+
+        print("\n📊 PERFORMANCE METRICS")
+        print("-" * 40)
+
+        # Sharpe ratio
+        print(f"📈 Sharpe Ratio: {sharpe.get('sharperatio', 'N/A')}")
+
+        # Drawdown
+        print(f"📉 Max Drawdown: {drawdown.max.drawdown:.2f}%")
+        print(f"📉 Max Drawdown Duration: {drawdown.max.len} bars")
+
+        # Returns
+        print(f"📈 Total Return: {returns.get('rtot', 0):.4f}")
+        print(f"📈 Annualized Return: {returns.get('rnorm', 0):.4f}")
+
+        # Trades
+        total_trades = trades.total.total if trades.total else 0
+        won = trades.won.total if trades.won else 0
+        lost = trades.lost.total if trades.lost else 0
+
+        print(f"🔁 Total Trades: {total_trades}")
+        print(f"✅ Winning Trades: {won}")
+        print(f"❌ Losing Trades: {lost}")
+
+        if total_trades > 0:
+            win_rate = won / total_trades * 100
+            print(f"🏆 Win Rate: {win_rate:.2f}%")
+
+        print("-" * 40)
+
+        # Plot equity curve
         cerebro.plot(style="candlestick")
 
 
 if __name__ == "__main__":
     BacktestRunner().run()
+
