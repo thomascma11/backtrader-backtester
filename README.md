@@ -46,3 +46,17 @@ Install the required libraries:
 pip install -r requirements.txt
 
 
+## 📊 Example Quant Performance
+
+| Metric              | Value (Example) |
+|--------------------|------------------|
+| Sharpe Ratio       | 1.32             |
+| Max Drawdown       | -7.8%            |
+| Win Rate           | 54%              |
+| Total Trades       | 32               |
+| Annualized Return  | 12.4%            |
+| Final Portfolio    | $11,372.51       |
+
+All metrics are automatically saved to:
+
+
