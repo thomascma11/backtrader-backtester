@@ -1,37 +1,38 @@
 import backtrader as bt
 import pandas as pd
+import matplotlib.pyplot as plt
+from strategies.sma_cross import SmaCross
 
-class SMACross(bt.Strategy):
-    params = (('fast', 10), ('slow', 30),)
 
-    def __init__(self):
-        self.fast_ma = bt.ind.SMA(period=self.p.fast)
-        self.slow_ma = bt.ind.SMA(period=self.p.slow)
-        self.crossover = bt.ind.CrossOver(self.fast_ma, self.slow_ma)
+class BacktestRunner:
+    def __init__(self, csv_path="data/AAPL.csv", cash=10000, commission=0.001):
+        self.csv_path = csv_path
+        self.cash = cash
+        self.commission = commission
 
-    def next(self):
-        if not self.position:
-            if self.crossover > 0:
-                self.buy()
-        else:
-            if self.crossover < 0:
-                self.sell()
+    def load_data(self):
+        df = pd.read_csv(self.csv_path, index_col="Date", parse_dates=True)
+        df = df.sort_index()
+        return bt.feeds.PandasData(dataname=df)
 
-def run_backtest(csv_path):
-    cerebro = bt.Cerebro()
-    cerebro.addstrategy(SMACross)
+    def run(self):
+        cerebro = bt.Cerebro()
+        cerebro.broker.setcash(self.cash)
+        cerebro.broker.setcommission(commission=self.commission)
 
-    df = pd.read_csv(csv_path, index_col='Date', parse_dates=True)
-    data = bt.feeds.PandasData(dataname=df)
+        data = self.load_data()
+        cerebro.adddata(data)
 
-    cerebro.adddata(data)
-    cerebro.broker.set_cash(10000)
-    cerebro.broker.setcommission(commission=0.001)
+        cerebro.addstrategy(SmaCross)
 
-    print("Starting Portfolio Value:", cerebro.broker.getvalue())
-    cerebro.run()
-    print("Final Portfolio Value:", cerebro.broker.getvalue())
-    cerebro.plot()
+        print(f"Starting Portfolio Value: {cerebro.broker.getvalue():.2f}")
+        results = cerebro.run()
+        print(f"Final Portfolio Value: {cerebro.broker.getvalue():.2f}")
+
+        # Plot equity + strategy
+        cerebro.plot(style="candlestick")
+
 
 if __name__ == "__main__":
-    run_backtest("data/AAPL.csv")
+    runner = BacktestRunner()
+    runner.run()
