@@ -67,4 +67,31 @@ All metrics are automatically saved to:
 - **Equity Curve Visualization**
 - **Buy/Sell Signal Chart**
 
+backtrader-backtester/
+│── data/
+│   ├── AAPL.csv
+│   └── benchmark_SPY.csv
+│
+│── strategies/
+│   ├── sma_cross.py
+│   ├── rsi_strategy.py
+│   ├── macd_strategy.py
+│   └── bollinger_strategy.py
+│
+│── results/
+│   ├── metrics.json
+│   ├── benchmark.json
+│   ├── optimization.json
+│   ├── equity_curve.png
+│   ├── signals.png
+│   └── report.html
+│
+│── backtest.py              # core engine
+│── run.py                   # CLI interface
+│── benchmark.py             # compares vs SPY
+│── optimize.py              # auto parameter search
+│── report.py                # HTML report generator
+│── requirements.txt
+│── README.md
+
 
