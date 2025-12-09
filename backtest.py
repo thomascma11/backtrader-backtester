@@ -40,6 +40,20 @@ import yfinance as yf
 import json
 import os
 
+import matplotlib.pyplot as plt
+
+# Equity curve chart
+plt.plot(series.index, series.values)
+plt.title("Equity Curve")
+plt.savefig("results/equity_curve.png")
+plt.close()
+
+# Buy/sell signal chart placeholder
+plt.plot(series.index, series.values)
+plt.title("Buy/Sell Signals")
+plt.savefig("results/signals.png")
+plt.close()
+
 # Import strategies
 from strategies.sma_cross import SmaCross
 from strategies.rsi_strategy import RSIStrategy
