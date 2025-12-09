@@ -59,4 +59,12 @@ pip install -r requirements.txt
 
 All metrics are automatically saved to:
 
+- **Annual Return**
+- **Annual Volatility**
+- **Sharpe Ratio**
+- **Max Drawdown**
+- **Max Drawdown Duration**
+- **Equity Curve Visualization**
+- **Buy/Sell Signal Chart**
+
 
