@@ -66,6 +66,19 @@ class BacktestRunner:
 
         print(f"💰 Final Portfolio Value: {cerebro.broker.getvalue():,.2f}")
 
+        # Equity curve tracking
+        equity_curve = []
+        for i in range(len(cerebro.datas[0])):
+            dt = cerebro.datas[0].datetime.datetime(i)
+            value = cerebro.broker.getvalue()
+            equity_curve.append({"date": str(dt), "value": value})
+
+        metrics["equity_curve"] = equity_curve
+
+# Buy/Sell signal indices
+metrics["buy_signals"] = [i for i, v in enumerate(strat.buy_signals)]
+metrics["sell_signals"] = [i for i, v in enumerate(strat.sell_signals)]
+
         # Extract metrics
         sharpe = strat.analyzers.sharpe.get_analysis()
         drawdown = strat.analyzers.drawdown.get_analysis()
