@@ -1,19 +1,21 @@
 import backtrader as bt
 
-class SMACross(bt.Strategy):
-    params = (('fast', 10), ('slow', 30))
+
+class SmaCross(bt.Strategy):
+    params = dict(
+        fast=10,   # fast SMA
+        slow=30    # slow SMA
+    )
 
     def __init__(self):
-        self.fast_ma = bt.ind.SMA(period=self.p.fast)
-        self.slow_ma = bt.ind.SMA(period=self.p.slow)
-        self.crossover = bt.ind.CrossOver(self.fast_ma, self.slow_ma)
+        sma_fast = bt.ind.SMA(period=self.p.fast)
+        sma_slow = bt.ind.SMA(period=self.p.slow)
+        self.crossover = bt.ind.CrossOver(sma_fast, sma_slow)
 
     def next(self):
-        # Buy when fast MA crosses above slow MA
-        if not self.position:
-            if self.crossover > 0:
+        if not self.position:  
+            if self.crossover > 0:  
                 self.buy()
-        # Sell when fast MA crosses below slow MA
         else:
-            if self.crossover < 0:
+            if self.crossover < 0:  
                 self.sell()
