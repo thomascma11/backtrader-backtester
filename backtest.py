@@ -1,3 +1,40 @@
+import numpy as np
+import pandas as pd
+
+# Build daily portfolio series from equity curve
+values = [float(p["value"]) for p in equity_curve]
+dates = pd.to_datetime([p["date"] for p in equity_curve])
+
+series = pd.Series(values, index=dates)
+
+# Daily returns
+daily_returns = series.pct_change().dropna()
+
+# Annualized return
+annual_return = (1 + daily_returns.mean()) ** 252 - 1
+
+# Annualized volatility
+annual_volatility = daily_returns.std() * np.sqrt(252)
+
+# Sharpe Ratio (assume 0% risk-free rate)
+sharpe_ratio = annual_return / annual_volatility if annual_volatility != 0 else 0
+
+# Max Drawdown
+rolling_max = series.cummax()
+drawdowns = (series - rolling_max) / rolling_max
+max_drawdown = drawdowns.min()
+
+# Max Drawdown Duration
+drawdown_duration = (drawdowns == 0).astype(int)
+max_drawdown_duration = (drawdowns < 0).astype(int).groupby((drawdowns == 0).cumsum()).cumcount().max()
+
+# Save into metrics JSON
+metrics["annual_return"] = float(annual_return)
+metrics["annual_volatility"] = float(annual_volatility)
+metrics["sharpe_ratio"] = float(sharpe_ratio)
+metrics["max_drawdown"] = float(max_drawdown)
+metrics["max_drawdown_duration"] = int(max_drawdown_duration)
+
 import backtrader as bt
 import yfinance as yf
 import json
